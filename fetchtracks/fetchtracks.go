@@ -51,11 +51,11 @@ func isMusicTrack(fileName string) bool {
 
 }
 
-// Song must be "[artist] - [song]" e.g. "Mac Miller - The Spins"
+// Song must be "[artist] - [track]" e.g. "Mac Miller - The Spins"
 func parseMusicTrack(fileName string) (Track, error) {
 	out := strings.SplitN(fileName, " - ", 2)
 	if len(out) != 2 {
-		return Track{}, errors.New("cannot parse track, please use [artist] - [song]")
+		return Track{}, errors.New("cannot parse track, please use [artist] - [track] format")
 	}
 
 	return Track{

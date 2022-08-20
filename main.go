@@ -1,6 +1,14 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
+	"tospotify/fetchtracks"
+
 	"github.com/zmb3/spotify"
 )
 
@@ -10,4 +18,86 @@ type App struct {
 	MusicLibPath   string
 	Playlist       *spotify.FullPlaylist
 	RemoteTrackIds []spotify.ID
+	Tracks         []fetchtracks.Track
+}
+
+var redirectUrl = "http://localhost:3000/callback"
+var state = ""
+
+func main() {
+	relativePath := os.Args[1]
+	path, _ := filepath.Abs(relativePath)
+
+	app := App{
+		Auth:         spotify.NewAuthenticator(redirectUrl, spotify.ScopeUserLibraryModify, spotify.ScopeUserLibraryRead, spotify.ScopePlaylistModifyPrivate),
+		MusicLibPath: path,
+	}
+}
+func (app *App) CallbackHandler(w http.ResponseWriter, r *http.Request) {
+	token, err := app.Auth.Token(state, r)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, "Couldn't get token", http.StatusNotFound)
+		return
+	}
+
+	app.Client = app.Auth.NewClient(token)
+	fetchtracks.GetTracks(app.MusicLibPath, &app.Tracks)
+
+	app.CreateSpotifyPlaylist()
+	app.FindSpotifyTracks()
+	app.AddSpotifyTracks()
+
+	log.Print("Total mp3 tracks: " + strconv.Itoa(len(app.Tracks)))
+	log.Print("Added Spotify tracks: " + strconv.Itoa(len(app.RemoteTrackIds)))
+}
+
+func (app *App) FindSpotifyTracks() {
+	for _, track := range app.Tracks {
+		// query like "artist:" don't work unless the artist is the _exact_ name.
+		query := track.Name + " " + track.Artist
+		searchResult, err := app.Client.Search(query, spotify.SearchTypeTrack)
+
+		if err != nil {
+			log.Print(err)
+		}
+
+		newtrack := track.Artist + " - " + track.Name
+
+		if len(searchResult.Tracks.Tracks) == 0 {
+			log.Println(" :( FAILED " + newtrack)
+		} else {
+			log.Println(" :) PASSED " + newtrack)
+			app.RemoteTrackIds = append(app.RemoteTrackIds, searchResult.Tracks.Tracks[0].ID)
+		}
+	}
+}
+
+func (app *App) CreateSpotifyPlaylist() {
+	user, _ := app.Client.CurrentUser()
+	playlistName := "L2S " + time.Now().String()
+	app.Playlist, _ = app.Client.CreatePlaylistForUser(user.ID, playlistName, "group farting has begun", false)
+}
+
+func (app *App) AddSpotifyTracks() {
+	totalCount := len(app.RemoteTrackIds)
+	index := 0
+
+	for index < totalCount {
+		var i int
+		if totalCount-index >= 100 {
+			i = 100
+		} else {
+			i = totalCount % 100
+		}
+
+		ids := app.RemoteTrackIds[index : index+i]
+		_, err := app.Client.AddTracksToPlaylist(app.Playlist.ID, ids...)
+
+		if err != nil {
+			log.Panic("error adding track id", err)
+		}
+
+		index += i
+	}
 }
