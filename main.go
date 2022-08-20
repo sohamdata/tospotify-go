@@ -7,8 +7,10 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-	"tospotify/fetchtracks"
+	"tospotify-go/fetchtracks"
 
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/pkg/browser"
 	"github.com/zmb3/spotify"
 )
 
@@ -25,14 +27,22 @@ var redirectUrl = "http://localhost:3000/callback"
 var state = ""
 
 func main() {
-	relativePath := os.Args[1]
-	path, _ := filepath.Abs(relativePath)
-
+	path, _ := filepath.Abs(os.Args[1])
 	app := App{
 		Auth:         spotify.NewAuthenticator(redirectUrl, spotify.ScopeUserLibraryModify, spotify.ScopeUserLibraryRead, spotify.ScopePlaylistModifyPrivate),
 		MusicLibPath: path,
 	}
+	url := app.Auth.AuthURL(state)
+	browser.OpenURL(url)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/callback", app.CallbackHandler)
+	err := http.ListenAndServe("localhost:3000", mux)
+	if err != nil {
+		panic(err)
+	}
 }
+
 func (app *App) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := app.Auth.Token(state, r)
 	if err != nil {
@@ -57,13 +67,10 @@ func (app *App) FindSpotifyTracks() {
 		// query like "artist:" don't work unless the artist is the _exact_ name.
 		query := track.Name + " " + track.Artist
 		searchResult, err := app.Client.Search(query, spotify.SearchTypeTrack)
-
 		if err != nil {
 			log.Print(err)
 		}
-
 		newtrack := track.Artist + " - " + track.Name
-
 		if len(searchResult.Tracks.Tracks) == 0 {
 			log.Println(" :( FAILED " + newtrack)
 		} else {
@@ -90,14 +97,11 @@ func (app *App) AddSpotifyTracks() {
 		} else {
 			i = totalCount % 100
 		}
-
 		ids := app.RemoteTrackIds[index : index+i]
 		_, err := app.Client.AddTracksToPlaylist(app.Playlist.ID, ids...)
-
 		if err != nil {
 			log.Panic("error adding track id", err)
 		}
-
 		index += i
 	}
 }
