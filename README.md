@@ -1,5 +1,7 @@
 Create spotify playlist from songs stored locally (.mp3, .wav, .flac)
 
+Useful: [A Go wrapper for the Spotify Web API](https://github.com/zmb3/spotify) by zmb3
+
 ## Getting Started
 
 1) Create a app on [Spotify's developer dashboard](https://developer.spotify.com/dashboard/applications).
