@@ -1,6 +1,11 @@
-Create spotify playlist from songs stored locally (.mp3, .wav, .flac)
+# toSpotify
+Create spotify playlist from songs stored locally (.mp3, .wav, .flac)!
 
-Useful: [A Go wrapper for the Spotify Web API](https://github.com/zmb3/spotify) by zmb3
+### The purpose of this project is to learn and practice concepts related to:
+- Go Language
+- The Spotify Web API
+
+Used: [A Go wrapper for the Spotify Web API](https://github.com/zmb3/spotify) by zmb3
 
 ## Getting Started
 
