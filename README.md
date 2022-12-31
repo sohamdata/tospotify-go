@@ -1,5 +1,5 @@
 # toSpotify
-Create spotify playlist from songs stored locally (.mp3, .wav, .flac)!
+A command-line tool written in Go that allows users to quickly create a Spotify playlist from songs stored locally(.mp3, .wav, .flac)
 
 ### The purpose of this project is to learn and practice concepts related to:
 - Go Language
