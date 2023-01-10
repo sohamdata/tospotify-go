@@ -83,7 +83,7 @@ func (app *App) FindSpotifyTracks() {
 func (app *App) CreateSpotifyPlaylist() {
 	user, _ := app.Client.CurrentUser()
 	playlistName := "L2S " + time.Now().String()
-	app.Playlist, _ = app.Client.CreatePlaylistForUser(user.ID, playlistName, "group farting has begun", false)
+	app.Playlist, _ = app.Client.CreatePlaylistForUser(user.ID, playlistName, "this works", false)
 }
 
 func (app *App) AddSpotifyTracks() {
