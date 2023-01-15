@@ -14,6 +14,7 @@ type Track struct {
 }
 
 var allowedExtensions = map[string]bool{
+	// ".ext" : true,
 	".mp3": true,
 	".flac": true,
 	".wav": true,
