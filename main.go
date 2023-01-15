@@ -37,6 +37,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/callback", app.CallbackHandler)
+
 	// err := http.ListenAndServe("localhost:3000", mux)
 	// if err != nil {
 	// 	panic(err)
@@ -60,6 +61,9 @@ func (app *App) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	app.CreateSpotifyPlaylist()
 	app.FindSpotifyTracks()
 	app.AddSpotifyTracks()
+
+	// w.Write([]byte("Playlist created successfully! Please check your Spotify account"))
+	http.Redirect(w, r, "https://open.spotify.com/collection/playlists", http.StatusSeeOther)
 
 	log.Print("Total mp3 tracks: " + strconv.Itoa(len(app.Tracks)))
 	log.Print("Added Spotify tracks: " + strconv.Itoa(len(app.RemoteTrackIds)))
@@ -85,8 +89,9 @@ func (app *App) FindSpotifyTracks() {
 
 func (app *App) CreateSpotifyPlaylist() {
 	user, _ := app.Client.CurrentUser()
-	playlistName := "L2S " + time.Now().String()
-	app.Playlist, _ = app.Client.CreatePlaylistForUser(user.ID, playlistName, "this works", false)
+	date := time.Now().Format("02-01-2006 15:04:05")
+	playlistName := "toSpotify " + date
+	app.Playlist, _ = app.Client.CreatePlaylistForUser(user.ID, playlistName, "songs to vibe to in your TikTok videos", false)
 }
 
 func (app *App) AddSpotifyTracks() {
