@@ -20,3 +20,7 @@ Used: [A Go wrapper for the Spotify Web API](https://github.com/zmb3/spotify) by
 > Song must be in the format **[Artist] - [Track]** e.g. "Post Malone - Money Made Me Do It"
 
 > To add more file extensions, add them to the `allowedExtensions` in trackparser.go
+
+demo:
+
+![demo](https://user-images.githubusercontent.com/78294692/212536072-81cc88b9-d262-446a-8628-8bb066e3eef9.gif)
