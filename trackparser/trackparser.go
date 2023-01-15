@@ -1,4 +1,4 @@
-package fetchtracks
+package trackparser
 
 import (
 	"errors"
@@ -11,6 +11,12 @@ import (
 type Track struct {
 	Artist string
 	Name   string
+}
+
+var allowedExtensions = map[string]bool{
+	".mp3": true,
+	".flac": true,
+	".wav": true,
 }
 
 func GetTracks(path string, tracks *[]Track) {
@@ -45,9 +51,11 @@ func GetTracks(path string, tracks *[]Track) {
 func isMusicTrack(fileName string) bool {
 	ext := strings.ToLower(filepath.Ext(fileName))
 
-	return strings.HasSuffix(ext, ".mp3") ||
-		strings.HasSuffix(ext, ".flac") ||
-		strings.HasSuffix(ext, ".wav")
+	// return strings.HasSuffix(ext, ".mp3") ||
+	// 	strings.HasSuffix(ext, ".flac") ||
+	// 	strings.HasSuffix(ext, ".wav")
+	_, ok := allowedExtensions[ext]
+	return ok
 
 }
 

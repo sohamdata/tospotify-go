@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-	"tospotify-go/fetchtracks"
+	"tospotify-go/trackparser"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/browser"
@@ -20,7 +20,7 @@ type App struct {
 	MusicLibPath   string
 	Playlist       *spotify.FullPlaylist
 	RemoteTrackIds []spotify.ID
-	Tracks         []fetchtracks.Track
+	Tracks         []trackparser.Track
 }
 
 var redirectUrl = "http://localhost:3000/callback"
@@ -37,9 +37,12 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/callback", app.CallbackHandler)
-	err := http.ListenAndServe("localhost:3000", mux)
-	if err != nil {
-		panic(err)
+	// err := http.ListenAndServe("localhost:3000", mux)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	if err := http.ListenAndServe("localhost:3000", mux); err != nil {
+		log.Fatalf("Failed to start the server: %v", err)
 	}
 }
 
@@ -52,7 +55,7 @@ func (app *App) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.Client = app.Auth.NewClient(token)
-	fetchtracks.GetTracks(app.MusicLibPath, &app.Tracks)
+	trackparser.GetTracks(app.MusicLibPath, &app.Tracks)
 
 	app.CreateSpotifyPlaylist()
 	app.FindSpotifyTracks()
