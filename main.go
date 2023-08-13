@@ -61,9 +61,9 @@ func (app *App) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	app.CreateSpotifyPlaylist()
 	app.FindSpotifyTracks()
 	app.AddSpotifyTracks()
-	
+
 	w.Write([]byte("<html><head><meta http-equiv='refresh' content='5;url=https://open.spotify.com/collection/playlists' /></head>" +
-	"<body>Playlist created successfully! You will be redirected to your spotify in few seconds.</body></html>"))
+		"<body>Playlist created successfully! You will be redirected to your spotify in few seconds.</body></html>"))
 
 	log.Print("Total mp3 tracks: " + strconv.Itoa(len(app.Tracks)))
 	log.Print("Added Spotify tracks: " + strconv.Itoa(len(app.RemoteTrackIds)))
